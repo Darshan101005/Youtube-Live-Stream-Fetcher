@@ -55,7 +55,6 @@ nohup python3 app.py > /dev/null 2>&1 &
 | Method | Endpoint | Description |
 | --- | --- | --- |
 | `GET` | `/` | Web Interface with ID generator and documentation. |
-| `GET` | `/api/get_url?id={ID}` | Returns JSON with the direct m3u8 URL. |
 | `GET` | `/{ID}` | Redirects immediately to the stream URL. |
 | `GET` | `/{ID}/proxy` | Proxies the stream through the server (Restream). |
 | `GET` | `/{ID}/proxy/{PROXY_URL}` | Fetches the stream using an external HTTP proxy. |
