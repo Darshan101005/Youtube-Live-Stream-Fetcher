@@ -344,13 +344,13 @@ def api_get_url():
     target = request.args.get('id')
     url = get_yt_link(target)
     if url: return jsonify({"success": True, "url": url})
-    return jsonify({"success": False, "error": "Hs manifest not found"})
+    return jsonify({"success": False, "error": "Hls manifest not found"})
 
 @app.route('/<identifier>')
 @app.route('/<identifier>/index.m3u8')
 def direct_route(identifier):
     url = get_yt_link(identifier)
-    if not url: return "Hs manifest not found", 404
+    if not url: return "Hls manifest not found", 404
     return redirect(url)
 
 @app.route('/<identifier>/proxy')
@@ -364,7 +364,7 @@ def proxy_route(identifier, ext_proxy=None):
         if "https:/" in p_url and "https://" not in p_url: p_url = p_url.replace("https:/", "https://")
         elif "http:/" in p_url and "http://" not in p_url: p_url = p_url.replace("http:/", "http://")
     url = get_yt_link(identifier, proxy_url=p_url)
-    if not url: return "Hs manifest not found", 404
+    if not url: return "Hls manifest not found", 404
     proxies = {"http": p_url, "https": p_url} if p_url else None
     try:
         r = requests.get(url, headers=HEADERS, proxies=proxies, timeout=15)
