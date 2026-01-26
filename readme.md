@@ -66,6 +66,10 @@ nohup python3 app.py > /dev/null 2>&1 &
 * **Channel ID:** `UCttspZesZIDEwwpVIgoZtWQ`
 
 ---
+## UI/UX
+
+<img width="1919" height="864" alt="image" src="https://github.com/user-attachments/assets/bb256f97-5235-499d-9b2e-4c462394b4fd" />
+<img width="1918" height="866" alt="image" src="https://github.com/user-attachments/assets/6646bc02-ebb1-4d65-a9bc-74b975b37c3a" />
 
 ## ⚙️ Configuration
 
