@@ -2,8 +2,8 @@ from flask import Flask, render_template_string, request, Response, redirect, js
 import yt_dlp
 import requests
 import base64
-import time
 from urllib.parse import unquote, quote
+import time
 
 app = Flask(__name__)
 
@@ -15,7 +15,7 @@ HTML_TEMPLATE = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Live Fetcher</title>
+    <title>YouTube Live Fetcher | Pro</title>
     <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/2/20/YouTube_2024.svg">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -29,7 +29,7 @@ HTML_TEMPLATE = """
             --input: #2b2b2b; --border: #333; --shadow: rgba(0,0,0,0.5);
         }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; transition: 0.3s; display: flex; flex-direction: column; min-height: 100vh; }
-
+        
         nav { width: 100%; padding: 25px; display: flex; justify-content: flex-end; box-sizing: border-box; }
         .theme-btn { 
             background: var(--card); border: 1px solid var(--border); color: var(--text); 
@@ -42,7 +42,7 @@ HTML_TEMPLATE = """
 
         .container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
         .card { background: var(--card); padding: 40px; border-radius: 24px; box-shadow: 0 20px 40px var(--shadow); width: 100%; max-width: 450px; text-align: center; position: relative; }
-
+        
         .logo-main { width: 120px; margin-bottom: 10px; }
         h1 { font-size: 22px; margin-bottom: 30px; font-weight: 600; }
 
@@ -50,18 +50,13 @@ HTML_TEMPLATE = """
 
         .field { margin-bottom: 20px; text-align: left; }
         label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 8px; opacity: 0.7; }
-
-        input, .custom-select { 
+        
+        input, select { 
             width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border); 
             background: var(--input); color: var(--text); font-size: 15px; outline: none; box-sizing: border-box;
         }
-
+        
         .select-wrapper { position: relative; }
-        select { 
-            appearance: none; -webkit-appearance: none; width: 100%; padding: 14px; 
-            border-radius: 12px; border: 1px solid var(--border); background: var(--input); 
-            color: var(--text); cursor: pointer; outline: none; transition: 0.2s;
-        }
         .select-wrapper::after {
             content: '\\f107'; font-family: "Font Awesome 6 Free"; font-weight: 900;
             position: absolute; right: 15px; top: 50%; transform: translateY(-50%); pointer-events: none;
@@ -106,7 +101,7 @@ HTML_TEMPLATE = """
         <div class="card">
             <img src="https://upload.wikimedia.org/wikipedia/commons/2/20/YouTube_2024.svg" class="logo-main">
             <h1>YouTube Live Fetcher</h1>
-
+            
             <div class="user-info">
                 {% if geo.location %}<i class="fas fa-map-marker-alt"></i> {{ geo.location }} <br>{% endif %}
                 {% if geo.isp %}<i class="fas fa-network-wired"></i> {{ geo.isp }} <br>{% endif %}
@@ -192,7 +187,7 @@ HTML_TEMPLATE = """
             const target = document.getElementById('target').value.trim();
             const isOutput = document.getElementById('goal_output').checked;
             const status = document.getElementById('status');
-
+            
             if(!target) { alert("Please enter an identifier"); return; }
             status.style.display = 'none';
 
@@ -247,42 +242,17 @@ DOCS_TEMPLATE = """
 </head>
 <body>
     <h1>System Documentation</h1>
-    <p>This script allows you to obtain direct HLS (.m3u8) manifests for Live streams.</p>
-
-    <h2>1. Supported Identifiers</h2>
+    <p>Obtain direct HLS (.m3u8) manifests for Live streams.</p>
+    <h2>1. Identifiers</h2>
     <ul>
-        <li><strong>Watch ID:</strong> The 11-digit ID in URL (e.g., <code>VNzHENanD0g</code>)</li>
-        <li><strong>Handle:</strong> Channel @username (e.g., <code>@polimernews</code>)</li>
-        <li><strong>Channel ID:</strong> Full YouTube ID starting with UC (e.g., <code>UCttspZesZIDEwwpVIgoZtWQ</code>)</li>
+        <li><strong>Watch ID:</strong> <code>VNzHENanD0g</code></li>
+        <li><strong>Handle:</strong> <code>@username</code></li>
+        <li><strong>Channel ID:</strong> <code>UCttspZesZIDEwwpVIgoZtWQ</code></li>
     </ul>
-
     <h2>2. API Endpoints</h2>
-
-    <div class="endpoint">
-        <strong>Direct Multi-Quality Redirect</strong><br>
-        <code>GET /&lt;identifier&gt;</code><br>
-        Example: <code>/VNzHENanD0g</code>
-    </div>
-
-    <div class="endpoint">
-        <strong>Server-Side Proxy (Restream)</strong><br>
-        <code>GET /&lt;identifier&gt;/proxy</code><br>
-        Forces all video data to flow through this server.
-    </div>
-
-    <div class="endpoint">
-        <strong>External Proxy Route</strong><br>
-        <code>GET /&lt;identifier&gt;/proxy/&lt;encoded_proxy_url&gt;</code><br>
-        Uses a custom HTTP proxy to fetch segments.
-    </div>
-
-    <div class="endpoint">
-        <strong>Standard M3U8 Alias</strong><br>
-        <code>GET /&lt;identifier&gt;/index.m3u8</code><br>
-        <code>GET /&lt;identifier&gt;/proxy/index.m3u8</code><br>
-        <code>GET /&lt;identifier&gt;/proxy/&lt;proxy_url&gt;/index.m3u8</code>
-    </div>
-
+    <div class="endpoint"><strong>Direct:</strong> <code>GET /&lt;id&gt;</code></div>
+    <div class="endpoint"><strong>Restream:</strong> <code>GET /&lt;id&gt;/proxy</code></div>
+    <div class="endpoint"><strong>External Proxy:</strong> <code>GET /&lt;id&gt;/proxy/&lt;encoded_proxy&gt;</code></div>
     <p><a href="/">← Back to Home</a></p>
 </body>
 </html>
@@ -304,32 +274,33 @@ def get_geo_info():
 def b64e(s): return base64.urlsafe_b64encode(s.encode()).decode() if s else ""
 def b64d(s): return base64.urlsafe_b64decode(s.encode()).decode() if s else ""
 
-def get_yt_link(target, proxy_url=None):
+def get_yt_link(target, proxy_url=None, retries=5):
     if target.startswith('@'): url = f"https://www.youtube.com/{target}/live"
     elif target.startswith('UC'): url = f"https://www.youtube.com/channel/{target}/live"
     else: url = f"https://www.youtube.com/watch?v={target}"
-
-    opts = {'quiet': True, 'no_warnings': True, 'nocheckcertificate': True, 'format': 'best'}
+    
+    opts = {
+        'quiet': True, 
+        'no_warnings': True, 
+        'nocheckcertificate': True, 
+        'format': 'best',
+        'cookiefile': 'cookies.txt',
+        'source_address': '0.0.0.0',
+        'socket_timeout': 15,
+        'extractor_args': {'youtube': {'player_client': ['android', 'ios', 'web']}}
+    }
     if proxy_url: opts['proxy'] = proxy_url
-
-    for i in range(5):
+    
+    for i in range(retries):
         try:
             with yt_dlp.YoutubeDL(opts) as ydl:
                 info = ydl.extract_info(url, download=False)
                 res = info.get('manifest_url') or info.get('url')
                 if res: return res
         except:
-            pass
-        time.sleep(2)
-
-    time.sleep(10)
-
-    try:
-        with yt_dlp.YoutubeDL(opts) as ydl:
-            info = ydl.extract_info(url, download=False)
-            return info.get('manifest_url') or info.get('url')
-    except:
-        return None
+            if i < retries - 1: time.sleep(1)
+            continue
+    return None
 
 @app.route('/')
 def home():
@@ -344,13 +315,13 @@ def api_get_url():
     target = request.args.get('id')
     url = get_yt_link(target)
     if url: return jsonify({"success": True, "url": url})
-    return jsonify({"success": False, "error": "Hls manifest not found"})
+    return jsonify({"success": False, "error": "Hs manifest not found"})
 
 @app.route('/<identifier>')
 @app.route('/<identifier>/index.m3u8')
 def direct_route(identifier):
     url = get_yt_link(identifier)
-    if not url: return "Hls manifest not found", 404
+    if not url: return "Hs manifest not found", 404
     return redirect(url)
 
 @app.route('/<identifier>/proxy')
@@ -363,8 +334,10 @@ def proxy_route(identifier, ext_proxy=None):
         p_url = unquote(ext_proxy)
         if "https:/" in p_url and "https://" not in p_url: p_url = p_url.replace("https:/", "https://")
         elif "http:/" in p_url and "http://" not in p_url: p_url = p_url.replace("http:/", "http://")
+    
     url = get_yt_link(identifier, proxy_url=p_url)
-    if not url: return "Hls manifest not found", 404
+    if not url: return "Hs manifest not found", 404
+    
     proxies = {"http": p_url, "https": p_url} if p_url else None
     try:
         r = requests.get(url, headers=HEADERS, proxies=proxies, timeout=15)
@@ -391,4 +364,4 @@ def ts_proxy():
     except: return "Stream Error", 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000, debug=False)
+    app.run(host='0.0.0.0', port=5000, threaded=True)
